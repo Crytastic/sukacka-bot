@@ -34,12 +34,7 @@ module.exports = {
             }
         });
 
-        let reply = 'Šukačka count:\n';
-        for (const [user, count] of Object.entries(sukackaCount)) {
-            reply += `${user}: ${count}\n`;
-        }
-
-        await interaction.reply(reply);
+        await interaction.reply(getLeaderboard(sukackaCount, interaction));
     },
 };
 
@@ -53,3 +48,22 @@ function hasSukackaSticker(message) {
     });
 }
 
+function getLeaderboard(sukackaCount, interaction) {
+    const sortedUsers = Object.entries(sukackaCount).sort((a, b) => b[1] - a[1]);
+
+    let reply = '🏆 **ŽEBŘÍČEK ŠUKÁNÍ** 🏆\n\n';
+    sortedUsers.forEach(([user, count], index) => {
+        if (index === 0) {
+            const member = interaction.guild.members.cache.find(member => member.user.tag === user);
+            if (member) {
+                reply += `🥇 <@${member.id}>: ${count}\n`;
+            } else {
+                reply += `🥇 ${user}: ${count}\n`;
+            }
+        } else {
+            reply += `${index + 1}. ${user}: ${count}\n`;
+        }
+    });
+
+    return reply;
+}
