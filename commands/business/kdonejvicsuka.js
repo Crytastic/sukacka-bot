@@ -23,14 +23,14 @@ module.exports = {
         messages.forEach(message => {
             if (message.author.bot) return;
 
-            console.log(message.content);
-            const sukackaUsage = (message.content.match(/<:sukacka:\d+>/g) || []).length;
+            const hasEmote = hasSukackaEmote(message);
+            const hasSticker = hasSukackaSticker(message);
 
-            if (sukackaUsage > 0) {
+            if (hasEmote || hasSticker) {
                 if (!sukackaCount[message.author.tag]) {
                     sukackaCount[message.author.tag] = 0;
                 }
-                sukackaCount[message.author.tag] += sukackaUsage;
+                sukackaCount[message.author.tag] += 1;
             }
         });
 
@@ -42,3 +42,14 @@ module.exports = {
         await interaction.reply(reply);
     },
 };
+
+function hasSukackaEmote(message) {
+    return (message.content.match(/<:sukacka:\d+>/g) || []).length > 0;
+}
+
+function hasSukackaSticker(message) {
+    return message.stickers.some(sticker => {
+        return sticker.name === 'SUKACKA';
+    });
+}
+
